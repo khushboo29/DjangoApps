@@ -43,5 +43,5 @@ user.post_set
 user.post_set.all()
 user.post_set.create(title='Blog 3',content='Third Post content')
 #no need to save it by cmd, it automatically saves it
-
+python manage.py startapp users
 
