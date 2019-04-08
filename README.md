@@ -13,4 +13,6 @@ python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 	cred: username: khushboo29
-			pwd: testing@123
+		pwd: testing@123
+	username: TestUser
+		pwd: testing@123
