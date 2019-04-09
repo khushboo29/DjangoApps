@@ -44,4 +44,17 @@ user.post_set.all()
 user.post_set.create(title='Blog 3',content='Third Post content')
 #no need to save it by cmd, it automatically saves it
 python manage.py startapp users
+we are using 'Crispy forms'
+pip install django-crispy-forms
+pip install Pillow
+
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.filter(username='khushboo29')
+>>> user = User.objects.filter(username='khushboo29').first()
+>>> user.profile
+<Profile: khushboo29 Profile>
+>>> user.profile.image
+<ImageFieldFile: profile_pics/Koala.jpg>
+>>> user.profile.image.url
+'profile_pics/Koala.jpg'
 
