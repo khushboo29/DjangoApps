@@ -1,0 +1,146 @@
+adding hostname
+hostnamectl set-hostname <hostnamehere>
+
+adding user 
+adduser <username>
+
+adding user to particular group 
+adduser <username> <group-sudo>
+
+ssh to server
+ssh username@ipaddress
+
+(in ur local machine)
+making key based ssh instead of password
+mkdir -p ~/.ssh
+ssh-keygen -b 4096
+#copying public key from local machine to ur server
+scp ~/.ssh/id_rsa.pub username@ipaddress:~/.ssh/authorized_keys 
+
+(on server give permissions to .ssh folders)
+sudo chmod 700 ~/.ssh/ 
+sudo chmod 600 ~/.ssh/* 
+
+#not allowed root login and allowed password authentiation
+sudo nano /etc/ssh/sshd_config
+PermitRootLogin yes to no
+PasswordAuthentication yes to no  
+
+#to restart ssh service
+sudo systemctl restart sshd
+
+#ufw Uncomplicated FireWall easier than IP tables
+sudo apt-get install ufw
+
+#basic rules to setup ufw
+sudo ufw default allow outgoing
+sudo ufw default deny incoming
+sudo ufw allow ssh
+sudo ufw allow 8000
+sudo ufw enable
+sudo ufw status
+
+(pushing code from local machine to server)
+scp -r django_project username@ipaddress:~/
+
+installation on server
+sudo apt-get install python3-pip
+sudo apt-get install python3-venv
+
+#create virutalenv
+python3 -m venv django_project/venv
+
+activate venv
+
+#install requirement into venv
+pip install -r requirement.txt
+
+#changes in settings.py
+allowed_host = ['ipaddress']
+static_root = os.path.join(BASE_DIR, 'static')
+
+#to collect static files on server
+python manage.py collectstatic
+
+#run development server
+python manage.py runserver 0.0.0.0:8000
+
+#now u can access ur app on ipaddress
+ipaddress:8000
+
+#need to change email variables from local to server
+use Apache webserver for that 
+sudo apt-get install apache2
+#WSGI web service gateway interface
+sudo apt-get install libapache2-mod-wsgi-py3
+
+#configure apache webserver
+cd /etc/apache2/sites-available
+sudo cp 000-default.conf django_project.conf 
+sudo nano django_project.conf
+
+#editing conf file
+<VirtualHost>	
+
+#making alias of static files dir
+alias /static /home/username/django_project/static
+
+#permissions
+<Directory /home/username/django_project/static>
+	Required all granted
+</Directory>
+
+#making alias of media files dir
+alias /media /home/username/django_project/media
+
+#permissions
+<Directory /home/username/django_project/media>
+	Required all granted
+</Directory>
+
+#access to wsgi files so apache can access this 
+<Directory /home/username/django_project/django_project>
+	<Files wsgi.py>
+		Required all granted
+	</Files>
+</Directory>
+
+#demon mode recommened in django doc 
+WSGIScriptAlias / /home/username/django_project/django_project/wsgi.py
+WSGIDeamonProcess django_app python-path=/home/username/django_project/django_project python-home=/home/username/django_project/venv
+WSGIProcessGroup django_app
+
+</VirtualHost>
+
+#enable apache2 site
+sudo a2ensite django_project
+
+#disable default site
+sudo a2dissite 000-default.conf
+
+#apache has to read/write db and django permission for static files
+sudo chown :www-data django_project/db.sqllite3
+sudo chmod 664 django_project/db.sqllite3
+sudo chown :www-data django_project/
+
+#permissions for media folders
+sudo chown -R :www-data django_project/media
+sudo chmod -R 775 django_project/media
+sudo chmod 775 django_project/
+
+#config file for sensitive info like secret key, email username password db_username and db_password
+sudo touch /etc/config.json
+#remove secret key from settings.py and paste into config.json
+#put the info u want to put which is sensitive like "EMAIL_USER" and "EMAIL_PASS"
+#deug should be false on prod
+DEBUG=False
+#get email user and pass from config instead of os.environ
+
+#allowing htp
+sudo ufw delete allow 8000
+sudo ufw allow http/tcp
+
+#restart apache service
+sudo service apache2 restart
+
+access ur site with ipaddress
