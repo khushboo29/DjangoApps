@@ -46,7 +46,7 @@ user.post_set.create(title='Blog 3',content='Third Post content')
 python manage.py startapp users
 we are using 'Crispy forms'
 pip install django-crispy-forms
-pip install Pillow
+pip install PILLOW
 
 >>> from django.contrib.auth.models import User
 >>> user = User.objects.filter(username='khushboo29')
@@ -57,4 +57,33 @@ pip install Pillow
 <ImageFieldFile: profile_pics/Koala.jpg>
 >>> user.profile.image.url
 'profile_pics/Koala.jpg'
+
+# for pagination
+>>> from django.core.paginator import Paginator
+>>> post = ['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15']
+>>> p = Paginator(post,3)
+>>> p.num_pages
+5
+>>> for page in p.page_range:
+...     print(page)
+...
+1
+2
+3
+4
+5
+>>> p1 = p.page(1)
+>>> p1
+<Page 1 of 5>
+>>> p1.number
+1
+>>> p1.object_list
+['1', '2', '3']
+>>> p1.has_previous()
+False
+>>> p1.has_next()
+True
+>>> p1.next_page_number()
+2
+>>>
 
