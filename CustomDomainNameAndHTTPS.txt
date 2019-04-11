@@ -1,0 +1,46 @@
+Use a Custom Domain Name for Our Application using linode and namecheap
+myawesomeapp.com
+add domain in allowed_host in settings.py
+
+enable HTTPS with a free SSL/TLS Certificate using Let's Encrypt
+#according to system and software you are using
+#Following commands for apache ubuntu 18.04
+#Read docs from following 
+https://certbot.eff.org/lets-encrypt/ubuntubionic-apache
+
+$ sudo apt-get update
+$ sudo apt-get install software-properties-common
+$ sudo add-apt-repository universe
+$ sudo add-apt-repository ppa:certbot/certbot
+$ sudo apt-get update
+$ sudo apt-get install certbot python-certbot-apache
+
+#change in apache config file
+sudo nano /etc/apache2/sites-available/django_project.conf
+ServerName www.myawesomeapp.com
+comment WSGI commands in virtualhost
+
+#now run following
+$ sudo certbot --apache
+
+in /etc/apache2/sites-available/django_project.conf remove alias and wsgi and directory stuff coz we have same in file that apache build
+
+the file apache build enable wsgi comment (uncomment these commands)
+
+#now test apache config
+apachectl configtest
+sudo apachectl configtest
+sudo ufw allow https
+sudo ufw deny http #although it is not required coz we are redirecting it to https
+
+sudo service apache2 restart
+
+#for renew
+$ sudo certbot renew --dry-run
+
+#add some cmnds to crontab
+sudo crontab -e
+
+#4:30 am on 1st of every month
+m h dom mon dow command
+30 4 1 * * sudo certbot renew --quiet
